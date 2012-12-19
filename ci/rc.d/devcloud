@@ -1,0 +1,49 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          devcloud
+# Required-Start:    $time $network
+# Required-Stop:     $time
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: report to devcloud gateway
+# Description:       report to devcloud gateway
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+. /lib/init/vars.sh
+
+do_start () {
+        export PYTHONPATH=/etc/devcloud-ci:/etc/devcloud-ci/ci:/etc/devcloud-ci/ci/devcloud
+        SCRIPTDIR=/etc/devcloud-ci/ci/devcloud
+        python $SCRIPTDIR/getworkerinfo.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
+        echo "1 $(date)" > /var/run/devcloud.run
+}
+
+do_status () {
+        if [ -f /var/run/devcloud.run ] ; then
+                return 0
+        else
+                return 4
+        fi
+}
+
+do_stop() {
+        if [ -f /var/run/devcloud.run ]; then
+                rm -f /var/run/devcloud.run
+                return 0
+        else
+                echo "devcloud didn't startup"
+                return 4
+        fi
+}
+
+case "$1" in
+  start|"")
+        do_start
+        ;;
+  restart|reload|force-reload)
+        echo "Error: argument '$1' not supported" >&2
+        exit 3
+        ;;
+esac
+:
