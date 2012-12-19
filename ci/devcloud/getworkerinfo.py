@@ -22,6 +22,6 @@ if __name__== '__main__':
     worker_ip = NetUtils.getIpAddress('xenbr0')
     print worker_mac, worker_ip
 
-    devcloud = remoteSSHClient.get_ssh_conn(args.host, 22, args.user, args.passwd)
+    devcloud = remoteSSHClient(args.host, 22, args.user, args.passwd)
     devcloud.execute("echo %s > %s/%s"%(worker_ip, args.out, worker_mac))
 

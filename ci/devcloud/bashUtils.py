@@ -55,14 +55,6 @@ class remoteSSHClient(object):
         except paramiko.SSHException, e:
             logging.debug(repr(e))
 
-
-    def get_ssh_conn(host, port, user, passwd):
-        try:
-            return remoteSSHClient(host, port, user, passwd)
-        except Exception as e:
-            raise Exception("Failure to reach back to dev cloud host %s" % e)
-
-
     def scp(self, srcFile, destPath):
         transport = paramiko.Transport((self.host, int(self.port)))
         transport.connect(username=self.user, password=self.passwd)
