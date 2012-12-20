@@ -15,7 +15,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 do_start () {
         export PYTHONPATH=/etc/devcloud-ci:/etc/devcloud-ci/ci:/etc/devcloud-ci/ci/devcloud
         SCRIPTDIR=/etc/devcloud-ci/ci/devcloud
-        python $SCRIPTDIR/getworkerinfo.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
+        python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
         echo "1 $(date)" > /var/run/devcloud.run
 }
 
@@ -45,5 +45,8 @@ case "$1" in
         echo "Error: argument '$1' not supported" >&2
         exit 3
         ;;
+   stop)
+       do_stop
+       ;;
 esac
 :
