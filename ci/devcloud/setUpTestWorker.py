@@ -109,7 +109,7 @@ class TestWorker(object):
         repo_head = self.fastForwardRepo()
         if self.healthCheck():
             result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
-                        "--load %s"%(self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py", repo_head))
+                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
             if result.isSuccess():
                 self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
                 print "SUCCESS"
