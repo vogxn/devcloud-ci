@@ -15,6 +15,12 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin:/opt/cloudstack/apache-maven-3.0.4/bin/:/usr/
 do_start () {
         export PYTHONPATH=/etc/devcloud-ci:/etc/devcloud-ci/ci:/etc/devcloud-ci/ci/devcloud
         SCRIPTDIR=/etc/devcloud-ci/ci/devcloud
+
+        #Get Latest GitHub CI scripts
+        pushd $SCRIPTDIR
+        git pull --rebase origin master
+        popd 
+
         python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
         echo "$? $(date)" > /var/run/devcloud.run
         poweroff #simply powerdown to give back worker to pool
