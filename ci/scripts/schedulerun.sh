@@ -17,6 +17,7 @@ getNext() {
 
 startVm() {
     if  [ -n $1 ]; then
+        worker=$1
         vboxmanage startvm $1 --type headless
         return $?
     fi
@@ -30,3 +31,5 @@ stopVm() {
 }
 
 startVm $(getNext)
+#After returns nosetests-gitcommit.xml
+#stopVm $worker

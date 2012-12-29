@@ -9,7 +9,7 @@
 # Description:       report to devcloud gateway
 ### END INIT INFO
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:/opt/cloudstack/apache-maven-3.0.4/bin/:/usr/local/bin
 . /lib/init/vars.sh
 
 do_start () {
