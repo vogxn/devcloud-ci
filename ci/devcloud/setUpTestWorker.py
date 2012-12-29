@@ -158,5 +158,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
     reporter.postNetworkInfo()
-    resultXml = run(TestWorker())
+    resultXml = run(TestWorker(), marvin)
     reporter.copyFile(resultXml)
