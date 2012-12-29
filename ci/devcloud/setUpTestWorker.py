@@ -124,12 +124,15 @@ class TestWorker(object):
             return self.resultXml
 
 
-def run(worker):
+def run(worker, install_marvin):
     worker.cleanUp()
-    worker.removeMarvin()
     worker.buildCloudStack()
-    worker.buildMarvin()
-    worker.installMarvin()
+
+    if install_marvin:
+        worker.removeMarvin()
+        worker.buildMarvin()
+        worker.installMarvin()
+
     worker.startManagement()
     worker.configure()
 
@@ -150,6 +153,7 @@ if __name__ == '__main__':
     parser.add_argument('--user', action="store", dest="user", default='root')
     parser.add_argument('--pass', action="store", dest="passwd", default='password')
     parser.add_argument('--out', action="store", dest="out", default='~/vbox/dhcp')
+    parser.add_argument('--marvin', action="store_true", dest="marvin", default=False)
 
     args = parser.parse_args()
     reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
