@@ -18,6 +18,7 @@ do_start () {
 
         #Get Latest GitHub CI scripts
         pushd $SCRIPTDIR
+        git reset --hard HEAD
         git pull --rebase origin master
         popd 
 
