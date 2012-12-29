@@ -24,7 +24,6 @@ do_start () {
 
         python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
         echo "$? $(date)" > /var/run/devcloud.run
-        poweroff #simply powerdown to give back worker to pool
 }
 
 do_status () {
