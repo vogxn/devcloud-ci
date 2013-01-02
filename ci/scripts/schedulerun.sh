@@ -15,9 +15,19 @@ getNext() {
     fi
 }
 
+getStatus() {
+    if [ -n $1 ]; then
+        local s=$(vboxmanage list runningvms | grep $1 | wc -l)
+        if [ $s -eq 1 ]; then
+            echo "running"
+        else
+            echo "stopped"
+        fi
+    fi
+}
+
 startVm() {
     if  [ -n $1 ]; then
-        worker=$1
         vboxmanage startvm $1 --type headless
         return $?
     fi
@@ -30,6 +40,17 @@ stopVm() {
     fi
 }
 
-startVm $(getNext)
-#After returns nosetests-gitcommit.xml
-#stopVm $worker
+worker=$(getNext)
+startVm $worker
+
+timeout=1800
+sleep $timeout
+
+worker_status=$(getStatus $worker)
+if [ $worker_status=="running" ];then
+    vboxmanage controlvm $worker poweroff
+    sleep 100
+fi
+
+snapshot=$(vboxmanage snapshot $worker list | awk '{print $4}' | sed 's/)//g')
+vboxmanage snapshot $worker restore $snapshot
