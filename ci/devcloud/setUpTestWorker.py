@@ -153,7 +153,7 @@ if __name__ == '__main__':
     parser.add_argument('--user', action="store", dest="user", default='root')
     parser.add_argument('--pass', action="store", dest="passwd", default='password')
     parser.add_argument('--out', action="store", dest="out", default='~/vbox/dhcp')
-    parser.add_argument('--marvin', action="store_true", dest="marvin", default=False)
+    parser.add_argument('--marvin', action="store_true", dest="marvin", default=True)
 
     args = parser.parse_args()
     reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
