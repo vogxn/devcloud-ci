@@ -1,7 +1,7 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          devcloud
-# Required-Start:    $time $network
+# Required-Start:    $time $named
 # Required-Stop:     $time
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
