@@ -129,7 +129,6 @@ def run(worker, install_marvin):
     worker.buildCloudStack()
 
     if install_marvin:
-        worker.removeMarvin()
         worker.buildMarvin()
         worker.installMarvin()
 
