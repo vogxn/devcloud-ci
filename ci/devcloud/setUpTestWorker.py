@@ -105,9 +105,8 @@ class TestWorker(object):
         return bash("nosetests -v --with-marvin --marvin-config=%s \
                 --load %s"%(self.MARVIN_CFG, "tools/marvin/marvin/testSetupSuccess.py")).isSuccess()
 
-    def runTests(self):
+    def runTests(self, repo_head):
         chdir(self.TEST_HOME)
-        repo_head = self.fastForwardRepo()
         if self.healthCheck():
             result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
                         "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
@@ -127,6 +126,7 @@ class TestWorker(object):
 
 def run(worker, install_marvin):
     worker.cleanUp()
+    repo_head = worker.fastForwardRepo()
     worker.buildCloudStack()
 
     if install_marvin:
@@ -143,7 +143,7 @@ def run(worker, install_marvin):
 
     worker.cleanUp()
     worker.startManagement()
-    worker.runTests()
+    worker.runTests(repo_head)
     return worker.getResultXml()
 
 
