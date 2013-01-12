@@ -1,5 +1,6 @@
 #/usr/bin/env python
 import argparse
+import logging
 import string
 from ci.devcloud.bashUtils import bash
 from os import chdir
@@ -112,11 +113,11 @@ class TestWorker(object):
                         "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
             if result.isSuccess():
                 self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
-                print "SUCCESS"
+                logging.info("SUCCESS")
             else:
-                print "FAIL"
+                logging.info("FAIL")
         else:
-            print "Health Check Failure"
+            logging.error("Health Check Failure")
             raise Exception("Health check fails!")
 
     def getResultXml(self):
@@ -129,6 +130,7 @@ def run(worker, install_marvin):
     worker.buildCloudStack()
 
     if install_marvin:
+        logging.debug("Installing marvin")
         worker.buildMarvin()
         worker.installMarvin()
 
@@ -145,7 +147,23 @@ def run(worker, install_marvin):
     return worker.getResultXml()
 
 
+def initLogging(logFile=None, lvl=logging.INFO):
+    try:
+        if logFile is None:
+            logging.basicConfig(level=lvl, \
+                                format="'%(asctime)-6s: %(name)s \
+                                (%(threadName)s) - %(levelname)s - %(message)s'")
+        else:
+            logging.basicConfig(filename=logFile, level=lvl, \
+                                format="'%(asctime)-6s: %(name)s \
+                                (%(threadName)s) - %(levelname)s - %(message)s'")
+    except:
+        logging.basicConfig(level=lvl)
+
+
 if __name__ == '__main__':
+    initLogging(logFile="/var/log/devcloudworker.log", lvl=logging.DEBUG)
+
     parser = argparse.ArgumentParser(description='Test worker')
 
     parser.add_argument('--host', action="store", dest="host", default='192.168.56.1')
@@ -156,6 +174,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
+    logging.info("Posting network information about worker to gateway")
     reporter.postNetworkInfo()
     resultXml = run(TestWorker(), args.marvin)
+    logging.info("test run recorded at %s"%resultXml)
     reporter.copyFile(resultXml)
+    logging.info("copied test results to gateway")
