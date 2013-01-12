@@ -3,7 +3,7 @@
 # Provides:          devcloud
 # Required-Start:    $named
 # Required-Stop:     $time
-# Default-Start:     3 4 5
+# Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: report to devcloud gateway
 # Description:       report to devcloud gateway
@@ -19,7 +19,7 @@ do_start () {
         #Get Latest GitHub CI scripts
         cd $SCRIPTDIR
         ping -c2 github.com
-        if [[ $? -gt 0 ]];then
+        if [ $? -gt 0 ];then
             sleep 10
         fi
         git reset --hard HEAD
