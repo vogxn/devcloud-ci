@@ -1,9 +1,9 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          devcloud
-# Required-Start:    $time $named
+# Required-Start:    $named
 # Required-Stop:     $time
-# Default-Start:     2 3 4 5
+# Default-Start:     3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: report to devcloud gateway
 # Description:       report to devcloud gateway
@@ -17,10 +17,13 @@ do_start () {
         SCRIPTDIR=/etc/devcloud-ci/ci/devcloud
 
         #Get Latest GitHub CI scripts
-        pushd $SCRIPTDIR
+        cd $SCRIPTDIR
+        ping -c2 github.com
+        if [[ $? -gt 0 ]];then
+            sleep 10
+        fi
         git reset --hard HEAD
-        git pull --rebase origin master
-        popd 
+        git pull --rebase origin master > /var/log/git.log
 
         python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
         echo "$? $(date)" > /var/run/devcloud.run
