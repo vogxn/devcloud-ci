@@ -173,10 +173,12 @@ if __name__ == '__main__':
     parser.add_argument('--marvin', action="store_true", dest="marvin", default=True)
 
     args = parser.parse_args()
+    resultXml = run(TestWorker(), args.marvin)
+    logging.info("test run recorded at %s"%resultXml)
+
     reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
     logging.info("Posting network information about worker to gateway")
     reporter.postNetworkInfo()
-    resultXml = run(TestWorker(), args.marvin)
-    logging.info("test run recorded at %s"%resultXml)
+
     reporter.copyFile(resultXml)
     logging.info("copied test results to gateway")
