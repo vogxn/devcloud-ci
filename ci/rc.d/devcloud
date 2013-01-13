@@ -25,7 +25,7 @@ do_start () {
         git reset --hard HEAD
         git pull --rebase origin master > /var/log/git.log
 
-        python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/prasanna/vbox/dhcp
+        python $SCRIPTDIR/setUpTestWorker.py --host 192.168.56.1 --user prasanna --pass vmops.com --out /home/jenkins/reports
         echo "$? $(date)" > /var/run/devcloud.run
 }
 
