@@ -182,20 +182,21 @@ if __name__ == '__main__':
     parser.add_argument('--marvin', action="store_true", dest="marvin", default=True)
 
     args = parser.parse_args()
-    resultXml = run(TestWorker(), args.marvin)
-    logging.info("test run recorded at %s"%resultXml)
-
-    reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
-    logging.info("Posting network information about worker to gateway")
-    reporter.postNetworkInfo()
-
-    with zipfile.ZipFile(arch_name, "w") as zf:
-        compression = zipfile.ZIP_DEFLATED
-        zf.write(testworkerlog, compress_type=compression)
-
-    with zipfile.ZipFile(arch_mgmt, "w") as mzf:
-        compression = zipfile.ZIP_DEFLATED
-        [mzf.write(log, compress_type=compression) for log in mslogs]
-
-    [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_name), path.join(workspace, arch_mgmt)]]
-    logging.info("copied test results and debug logs to gateway")
+    try:
+        resultXml = run(TestWorker(), args.marvin)
+        logging.info("test run recorded at %s"%resultXml)
+    except Exception, e:
+        logging.error(e)
+    finally:
+        logging.info("Posting network information about worker to gateway")
+        reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
+        reporter.postNetworkInfo()
+        #archiving and posting logs
+        with zipfile.ZipFile(arch_name, "w") as zf:
+            compression = zipfile.ZIP_DEFLATED
+            zf.write(testworkerlog, compress_type=compression)
+        with zipfile.ZipFile(arch_mgmt, "w") as mzf:
+            compression = zipfile.ZIP_DEFLATED
+            [mzf.write(log, compress_type=compression) for log in mslogs]
+        [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_name), path.join(workspace, arch_mgmt)]]
+        logging.info("copied test results and debug logs to gateway")
