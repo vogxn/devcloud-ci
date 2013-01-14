@@ -89,7 +89,7 @@ class TestWorker(object):
     def buildCloudStack(self):
         chdir(self.TEST_HOME)
         if bash("mvn -P developer,systemvm clean install -DskipTests").isSuccess():
-            if bash("mvn -P developer -pl developer,tools/devcloud -Ddeploydb").isSucess():
+            if bash("mvn -P developer -pl developer,tools/devcloud -Ddeploydb").isSuccess():
                 return True
             else:
                 logging.error("deploydb has errored out")
