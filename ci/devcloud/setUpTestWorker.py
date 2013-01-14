@@ -57,15 +57,6 @@ class TestWorker(object):
         chdir(self.TEST_HOME)
         bash("cat /dev/null > vmops.log")
 
-    def removeMarvin(self):
-        #uninstall marvin, marvin-nose
-        bash("pip uninstall -y marvin-nose")
-        bash("pip uninstall -y marvin")
-
-    def buildMarvin(self):
-        chdir(self.TEST_HOME)
-        bash("mvn -P developer -pl :cloud-apidoc -pl :cloud-marvin")
-
     def installMarvin(self):
         chdir(self.TEST_HOME)
         install_path = path.join(self.TEST_HOME, "tools/marvin/dist/Marvin-0.1.0.tar.gz")
@@ -132,7 +123,6 @@ def run(worker, install_marvin):
 
     if install_marvin:
         logging.debug("Installing marvin")
-        worker.buildMarvin()
         worker.installMarvin()
 
     worker.startManagement()
