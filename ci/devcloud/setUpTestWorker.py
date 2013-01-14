@@ -163,6 +163,9 @@ def initLogging(logFile=None, lvl=logging.INFO):
 if __name__ == '__main__':
     testworkerlog="/var/log/devcloudworker.log"
     arch_name = "testworkerlog.zip"
+
+    mslogs = ["/opt/cloudstack/incubator-cloudstack/vmops.log", "/opt/cloudstack/incubator-cloudstack/api.log"]
+    arch_mgmt = "mslog.zip"
     initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Test worker')
@@ -185,6 +188,9 @@ if __name__ == '__main__':
         compression = zipfile.ZIP_DEFLATED
         zf.write(testworkerlog, compress_type=compression)
 
-    reporter.copyFile(resultXml)
-    reporter.copyFile(arch_name)
+    with zipfile.ZipFile(arch_mgmt, "w") as mzf:
+        compression = zipfile.ZIP_DEFLATED
+        [mzf.write(log, compress_type=compression) for log in mslogs]
+
+    [reporter.copyFile(f) for f in [resultXml, arch_name, arch_mgmt]]
     logging.info("copied test results and debug logs to gateway")
