@@ -114,7 +114,7 @@ class TestWorker(object):
             else:
                 logging.info("FAIL")
         else:
-            logging.error("Health Check Failure")
+            logging.error("Health Check Failure. SystemVMs and/or build-in templates didn't come up")
             raise Exception("Health check fails!")
 
     def getResultXml(self):
