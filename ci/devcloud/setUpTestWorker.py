@@ -1,5 +1,6 @@
 #/usr/bin/env python
 import argparse
+import zipfile
 import logging
 import string
 from ci.devcloud.bashUtils import bash
@@ -163,6 +164,7 @@ def initLogging(logFile=None, lvl=logging.INFO):
 
 if __name__ == '__main__':
     testworkerlog="/var/log/devcloudworker.log"
+    arch_name = "testworkerlog.zip"
     initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Test worker')
@@ -181,6 +183,10 @@ if __name__ == '__main__':
     logging.info("Posting network information about worker to gateway")
     reporter.postNetworkInfo()
 
+    with zipfile.ZipFile(arch_name, "w") as zf:
+        compression = zipfile.ZIP_DEFLATED
+        zf.write(testworkerlog, compress_type=compression)
+
     reporter.copyFile(resultXml)
-    reporter.copyFile(testworkerlog)
+    reporter.copyFile(arch_name)
     logging.info("copied test results and debug logs to gateway")
