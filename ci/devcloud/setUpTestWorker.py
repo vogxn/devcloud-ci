@@ -27,7 +27,7 @@ class DevCloudReporter(object):
         self.devcloud.execute("echo %s > %s/%s" % (worker_ip, args.out, worker_mac))
 
     def copyFile(self, filename):
-        logging.debug("attmepting top copy %s to gw"%filename)
+        logging.debug("attempting to copy %s to gw"%filename)
         if path.exists(filename):
             chdir(path.dirname(filename))
             self.devcloud.scp(path.basename(filename), path.join(self.outdir, path.basename(filename)))
@@ -166,6 +166,7 @@ def initLogging(logFile=None, lvl=logging.INFO):
 if __name__ == '__main__':
     testworkerlog="/var/log/devcloudworker.log"
     arch_name = "testworkerlog.zip"
+    workspace="/opt/cloudstack/incubator-cloudstack"
 
     mslogs = ["/opt/cloudstack/incubator-cloudstack/vmops.log", "/opt/cloudstack/incubator-cloudstack/api.log"]
     arch_mgmt = "mslog.zip"
@@ -195,5 +196,5 @@ if __name__ == '__main__':
         compression = zipfile.ZIP_DEFLATED
         [mzf.write(log, compress_type=compression) for log in mslogs]
 
-    [reporter.copyFile(f) for f in [resultXml, arch_name, arch_mgmt]]
+    [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_name), path.join(workspace, arch_mgmt)]]
     logging.info("copied test results and debug logs to gateway")
