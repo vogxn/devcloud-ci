@@ -27,6 +27,7 @@ class DevCloudReporter(object):
         self.devcloud.execute("echo %s > %s/%s" % (worker_ip, args.out, worker_mac))
 
     def copyFile(self, filename):
+        logging.debug("attmepting top copy %s to gw"%filename)
         if path.exists(filename):
             chdir(path.dirname(filename))
             self.devcloud.scp(path.basename(filename), path.join(self.outdir, path.basename(filename)))
@@ -53,9 +54,6 @@ class TestWorker(object):
         bash("xe vm-uninstall --force --multiple")
         #TODO:cleanup secondary storage?
 
-        #cleanup logs
-        chdir(self.TEST_HOME)
-        bash("cat /dev/null > vmops.log")
 
     def installMarvin(self):
         chdir(self.TEST_HOME)
@@ -69,8 +67,9 @@ class TestWorker(object):
 
     def startManagement(self):
         chdir(self.TEST_HOME)
-        bash("mvn -P developer -pl :cloud-client-ui jetty:run &", background=True)
+        out = bash("mvn -P developer -pl :cloud-client-ui jetty:run &", background=True).isSuccess()
         bash("sleep 60") #TODO: Figure out working with listCapabilities
+        return out
 
     def configure(self):
         chdir(self.TEST_HOME)
@@ -80,7 +79,7 @@ class TestWorker(object):
             bash("sed -iv 's/%s/%s/g' %s"%(self.SED_DFLTIP2, self.SED_XENBR02, self.MARVIN_CFG))
         else:
             raise Exception("marvin configuration not found")
-        bash("mvn -P developer -pl tools/devcloud -Ddeploysvr")
+        return bash("mvn -P developer -pl tools/devcloud -Ddeploysvr").isSuccess()
 
     def fastForwardRepo(self, commit_id='HEAD'):
         bash("git fetch origin %s"%commit_id)
@@ -89,8 +88,15 @@ class TestWorker(object):
 
     def buildCloudStack(self):
         chdir(self.TEST_HOME)
-        bash("mvn -P developer,systemvm clean install -DskipTests")
-        bash("mvn -P developer -pl developer,tools/devcloud -Ddeploydb")
+        if bash("mvn -P developer,systemvm clean install -DskipTests").isSuccess():
+            if bash("mvn -P developer -pl developer,tools/devcloud -Ddeploydb").isSucess():
+                return True
+            else:
+                logging.error("deploydb has errored out")
+                return False
+        else:
+            logging.error("cloudstack build failed. see logs for details")
+            return False
 
     def healthCheck(self):
         chdir(self.TEST_HOME)
@@ -119,24 +125,29 @@ class TestWorker(object):
 def run(worker, install_marvin):
     worker.cleanUp()
     repo_head = worker.fastForwardRepo()
-    worker.buildCloudStack()
-
-    if install_marvin:
-        logging.debug("Installing marvin")
-        worker.installMarvin()
-
-    worker.startManagement()
-    worker.configure()
+    if worker.buildCloudStack():
+        if install_marvin:
+            logging.debug("Installing marvin")
+            worker.installMarvin()
+    else:
+        raise Exception("cloudstack build has failed. exiting")
+        
+    if worker.startManagement():
+        if not worker.configure():
+            raise Exception("failed to setup cloudstack zone")
+    else:
+        raise Exception("mgmt server didn't startup in time")
 
     #FIXME: override/db.properties should be able to update the host
     bash("mysql -uroot -Dcloud -e\"update configuration set value='%s' where "
          "name='host'\""%NetUtils.getIpAddress('xenbr0'))
 
     worker.cleanUp()
-    worker.startManagement()
-    worker.runTests(repo_head)
+    if worker.startManagement():
+        worker.runTests(repo_head)
+    else:
+        raise Exception("mgmt server did not startup in time")
     return worker.getResultXml()
-
 
 def initLogging(logFile=None, lvl=logging.INFO):
     try:
