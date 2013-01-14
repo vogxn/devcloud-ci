@@ -166,11 +166,11 @@ def initLogging(logFile=None, lvl=logging.INFO):
 
 if __name__ == '__main__':
     testworkerlog="/var/log/devcloudworker.log"
-    arch_name = "testworkerlog.zip"
+    arch_testworkerlog = "testworkerlog.zip"
     workspace="/opt/cloudstack/incubator-cloudstack"
 
     mslogs = ["/opt/cloudstack/incubator-cloudstack/vmops.log", "/opt/cloudstack/incubator-cloudstack/api.log"]
-    arch_mgmt = "mslog.zip"
+    arch_mslogs = "mslog.zip"
     initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Test worker')
@@ -192,11 +192,11 @@ if __name__ == '__main__':
         reporter = DevCloudReporter(args.host, args.passwd, args.user, args.out)
         reporter.postNetworkInfo()
         #archiving and posting logs
-        with zipfile.ZipFile(arch_name, "w") as zf:
+        with zipfile.ZipFile(arch_testworkerlog, "w") as zf:
             compression = zipfile.ZIP_DEFLATED
             zf.write(testworkerlog, compress_type=compression)
-        with zipfile.ZipFile(arch_mgmt, "w") as mzf:
+        with zipfile.ZipFile(arch_mslogs, "w") as mzf:
             compression = zipfile.ZIP_DEFLATED
             [mzf.write(log, compress_type=compression) for log in mslogs]
-        [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_name), path.join(workspace, arch_mgmt)]]
+        [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_testworkerlog), path.join(workspace, arch_mslogs)]]
         logging.info("copied test results and debug logs to gateway")
