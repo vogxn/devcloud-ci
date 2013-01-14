@@ -162,7 +162,8 @@ def initLogging(logFile=None, lvl=logging.INFO):
 
 
 if __name__ == '__main__':
-    initLogging(logFile="/var/log/devcloudworker.log", lvl=logging.DEBUG)
+    testworkerlog="/var/log/devcloudworker.log"
+    initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
 
     parser = argparse.ArgumentParser(description='Test worker')
 
@@ -181,4 +182,5 @@ if __name__ == '__main__':
     reporter.postNetworkInfo()
 
     reporter.copyFile(resultXml)
-    logging.info("copied test results to gateway")
+    reporter.copyFile(testworkerlog)
+    logging.info("copied test results and debug logs to gateway")
