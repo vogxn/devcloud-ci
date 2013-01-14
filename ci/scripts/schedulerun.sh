@@ -1,7 +1,8 @@
-#!/bin/bash
+echo $WORKSPACE
+whoami
 
 getNext() {
-    if [ -z `vboxmanage list runningvms`]; then
+    if [ -z `vboxmanage list runningvms` ]; then
         local next=$(vboxmanage list vms | head -1 | awk '{print $1}')
     else
         local next=$(vboxmanage list vms | grep -vE "`vboxmanage list runningvms`" | head -1 | awk '{print $1}')
@@ -40,6 +41,8 @@ stopVm() {
     fi
 }
 
+
+
 worker=$(getNext)
 startVm $worker
 
@@ -54,3 +57,6 @@ fi
 
 snapshot=$(vboxmanage snapshot $worker list | awk '{print $4}' | sed 's/)//g')
 vboxmanage snapshot $worker restore $snapshot
+
+mkdir -p $WORKSPACE/reports
+cp -r *.xml $WORKSPACE/reports/
