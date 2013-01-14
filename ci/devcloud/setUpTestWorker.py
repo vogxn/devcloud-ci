@@ -32,6 +32,7 @@ class DevCloudReporter(object):
             chdir(path.dirname(filename))
             self.devcloud.scp(path.basename(filename), path.join(self.outdir, path.basename(filename)))
         else:
+            logging.error("can't find file %s"%filename)
             raise IOError("Invalid path to copy")
 
 
