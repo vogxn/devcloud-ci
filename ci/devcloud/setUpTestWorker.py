@@ -49,8 +49,6 @@ class TestWorker(object):
         #kill any running java
         bash("killall -9 java")
 
-        #cleanup installed VMs
-        bash("xe vm-uninstall --force --multiple")
         #TODO:cleanup secondary storage?
 
         #cleanup logs
