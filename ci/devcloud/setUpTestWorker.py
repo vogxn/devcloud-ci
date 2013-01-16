@@ -190,12 +190,14 @@ if __name__ == '__main__':
     arch_mslogs = "mslog.zip"
     initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
 
-    parser = argparse.ArgumentParser(description='Test worker')
+    parser = argparse.ArgumentParser(description='Test worker within a devcloud \
+            appliance that will run integration tests and post the results to a \
+            virtual box gateway')
 
-    parser.add_argument('--host', action="store", dest="host", default='192.168.56.1')
-    parser.add_argument('--user', action="store", dest="user", default='root')
-    parser.add_argument('--pass', action="store", dest="passwd", default='password')
-    parser.add_argument('--out', action="store", dest="out", default='~/vbox/dhcp')
+    parser.add_argument('--host', action="store", help='virtualbox gateway machine', dest="host", default='192.168.56.1')
+    parser.add_argument('--user', action="store", help='*nix username of the user launching the workers', dest="user", default='jenkins')
+    parser.add_argument('--pass', action="store", help='password of the *nix user', dest="passwd", default='password')
+    parser.add_argument('--out', action="store", dest="out", default='/var/lib/jenkins/')
     parser.add_argument('--marvin', action="store_true", dest="marvin", default=True)
 
     args = parser.parse_args()
