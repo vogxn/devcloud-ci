@@ -50,7 +50,6 @@ class DevCloudReporter(object):
             self.devcloud.scp(path.basename(filename), path.join(self.outdir, path.basename(filename)))
         else:
             logging.error("can't find file %s"%filename)
-            raise IOError("Invalid path to copy")
 
 
 class TestWorker(object):
@@ -126,8 +125,8 @@ class TestWorker(object):
         if self.healthCheck():
             result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
                         "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
+            self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
             if result.isSuccess():
-                self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
                 logging.info("SUCCESS")
             else:
                 logging.info("FAIL")
