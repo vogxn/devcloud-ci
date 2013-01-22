@@ -131,7 +131,7 @@ class TestWorker(object):
             else:
                 logging.info("FAIL")
         else:
-            logging.error("Health Check Failure. SystemVMs and/or build-in templates didn't come up")
+            logging.error("Health Check Failure. SystemVMs and/or built-in templates didn't come up")
             raise Exception("Health check fails!")
 
     def getResultXml(self):
@@ -216,5 +216,7 @@ if __name__ == '__main__':
         with zipfile.ZipFile(arch_mslogs, "w") as mzf:
             compression = zipfile.ZIP_DEFLATED
             [mzf.write(log, compress_type=compression) for log in mslogs]
-        [reporter.copyFile(f) for f in [resultXml, path.join(workspace, arch_testworkerlog), path.join(workspace, arch_mslogs)]]
+        if resultXml is not None:
+            reporter.copyFile(resultXml)
+        [reporter.copyFile(f) for f in [path.join(workspace, arch_testworkerlog), path.join(workspace, arch_mslogs)]]
         logging.info("copied test results and debug logs to gateway")
