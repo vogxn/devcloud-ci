@@ -84,6 +84,7 @@ class TestWorker(object):
 
     def startManagement(self):
         chdir(self.TEST_HOME)
+        bash("export MAVEN_OPTS='-XX:MaxPermSize=512m -Xmx2g'")
         out = bash("mvn -P developer -pl :cloud-client-ui jetty:run &", background=True).isSuccess()
         bash("sleep 60") #TODO: Figure out working with listCapabilities
         return out
@@ -96,7 +97,7 @@ class TestWorker(object):
             bash("sed -iv 's/%s/%s/g' %s"%(self.SED_DFLTIP2, self.SED_XENBR02, self.MARVIN_CFG))
         else:
             raise Exception("marvin configuration not found")
-        return bash("mvn -P developer -pl tools/devcloud -Ddeploysvr").isSuccess()
+        return bash("mvn -Pdeveloper -pl tools/devcloud -Ddeploysvr").isSuccess()
 
     def fastForwardRepo(self, commit_id='HEAD'):
         bash("git fetch origin %s"%commit_id)
@@ -105,8 +106,8 @@ class TestWorker(object):
 
     def buildCloudStack(self):
         chdir(self.TEST_HOME)
-        if bash("mvn -P developer clean install -Dsystemvm -DskipTests").isSuccess():
-            if bash("mvn -P developer -pl developer,tools/devcloud -Ddeploydb").isSuccess():
+        if bash("mvn -Pdeveloper clean install -Dsystemvm -DskipTests").isSuccess():
+            if bash("mvn -Pdeveloper -pl developer,tools/devcloud -Ddeploydb").isSuccess():
                 return True
             else:
                 logging.error("deploydb has errored out")
@@ -124,7 +125,7 @@ class TestWorker(object):
         chdir(self.TEST_HOME)
         if self.healthCheck():
             result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
-                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
+                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke"))
             self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
             if result.isSuccess():
                 logging.info("SUCCESS")
