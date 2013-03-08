@@ -86,7 +86,7 @@ class TestWorker(object):
         chdir(self.TEST_HOME)
         bash("export MAVEN_OPTS='-XX:MaxPermSize=512m -Xmx2g'")
         out = bash("mvn -P developer -pl :cloud-client-ui jetty:run &", background=True).isSuccess()
-        bash("sleep 60") #TODO: Figure out working with listCapabilities
+        bash("sleep 90") #TODO: Figure out working with listCapabilities
         return out
 
     def configure(self):
