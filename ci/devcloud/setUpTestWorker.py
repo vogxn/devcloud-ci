@@ -125,7 +125,7 @@ class TestWorker(object):
         chdir(self.TEST_HOME)
         if self.healthCheck():
             result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
-                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke"))
+                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
             self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
             if result.isSuccess():
                 logging.info("SUCCESS")
