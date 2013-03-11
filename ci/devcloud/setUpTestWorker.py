@@ -124,8 +124,10 @@ class TestWorker(object):
     def runTests(self, repo_head):
         chdir(self.TEST_HOME)
         if self.healthCheck():
-            result=bash("nosetests -v --with-xunit --xunit-file=%s.xml --with-marvin --marvin-config=%s -a tags='devcloud' "
-                        "--load %s"%(repo_head, self.MARVIN_CFG, "test/integration/smoke/test_vm_life_cycle.py"))
+            result=bash("nosetests --with-xunit --xunit-file=%s.xml \
+                    --with-marvin --marvin-config=%s -x \
+                    --debug-log=nosedebug.log -a tags='devcloud' --load %s"%(repo_head, self.MARVIN_CFG,
+                    "test/integration/smoke/test_vm_life_cycle.py"))
             self.resultXml = path.join(path.abspath(curdir), repo_head+'.xml')
             if result.isSuccess():
                 logging.info("SUCCESS")
@@ -189,6 +191,9 @@ if __name__ == '__main__':
     mslogs = ["/opt/cloudstack/incubator-cloudstack/vmops.log", "/opt/cloudstack/incubator-cloudstack/api.log"]
     arch_mslogs = "mslog.zip"
     initLogging(logFile=testworkerlog, lvl=logging.DEBUG)
+    
+    noselog = "nosedebug.log"
+    arch_noselog = "noselog.zip"
 
     parser = argparse.ArgumentParser(description='Test worker within a devcloud \
             appliance that will run integration tests and post the results to a \
@@ -217,7 +222,12 @@ if __name__ == '__main__':
         with zipfile.ZipFile(arch_mslogs, "w") as mzf:
             compression = zipfile.ZIP_DEFLATED
             [mzf.write(log, compress_type=compression) for log in mslogs]
+        with zipfile.ZipFile(arch_noselog, "w") as zf:
+            compression = zipfile.ZIP_DEFLATED
+            zf.write(noselog, compress_type=compression)
         if resultXml is not None:
             reporter.copyFile(resultXml)
-        [reporter.copyFile(f) for f in [path.join(workspace, arch_testworkerlog), path.join(workspace, arch_mslogs)]]
+        [reporter.copyFile(f) for f in [path.join(workspace, arch_noselog),
+            path.join(workspace, arch_testworkerlog),
+            path.join(workspace, arch_mslogs)]]
         logging.info("copied test results and debug logs to gateway")
